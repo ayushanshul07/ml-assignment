@@ -1,0 +1,19 @@
+function [class1_c class1_m class2_c class2_m class3_c class3_m] = check_result(testarray)
+    class1_c = [];class1_m = [];
+    class2_c = [];class2_m = [];
+    class3_c = [];class3_m = [];
+    for i = 1:100
+        if testarray(i) == 1
+            class1_c = []
+            
+    end
+    
+    for i = 101:200
+        
+    end
+    
+    for i = 201:300
+        
+    end
+
+end
