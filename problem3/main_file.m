@@ -4,6 +4,7 @@
 
 % Reading all the images into matrix DATA(number of pixels in image X total images)
 warning('off');
+clear;clc;
 DATA = [];tmp = [];
 parameter = 200;
 row = 112; col = 92;
@@ -51,6 +52,9 @@ for i = 1:5
     string = strcat(num2str(i), '.pgm');
     path = strcat('./TOP5_eigenface_PartA/',string);
     imwrite(eigenfaces,path,'pgm');
+    figure()
+    imshow(eigenfaces)
+    title(['Eigen Face: ' num2str(i)])
 end
 
 
@@ -65,9 +69,9 @@ for i = 1:parameter
     strength = [strength tmp];
 end;
 
-figure;
 xaxis = 1:parameter; yaxis = strength;
-plot(xaxis',yaxis'); refline(0,95);
+figure()
+plot(xaxis',yaxis'); refline(0,95);xlabel('#dimensions');ylabel('Percentage variance caputered');
 hold on;
 
 % PART C > Reconstruction of Images
@@ -79,43 +83,36 @@ hold on;
     image_1v = new;
     new = new - mean;
     w = [];
-
+    mse = [];
     w = new' * U;
     
-    reconstructed = zeros(length(U),1);
-    % using only 1 eigenface(largest)
-    for i = 1:1
-        reconstructed = reconstructed + w(i)*U(:,i);
-    end
-    reconstructed = reconstructed + mean;
-    reconstructed = reshape(reconstructed,row,col);
-    mse = (reconstructed(:) - image_1v)'*(reconstructed(:) - image_1v)/10304
-    reconstructed = mat2gray(reconstructed);
-    imwrite(reconstructed,'face_input_1r_top1.pgm');
-    reconstructed = zeros(length(U),1);
-   
-    
-    % using 15 eigenface(largest)
-    for i = 1:15
-        reconstructed = reconstructed + w(i)*U(:,i);
-    end
-    reconstructed = reconstructed + mean;
-    reconstructed = reshape(reconstructed,row,col);
-    mse = (reconstructed(:) - image_1v)'*(reconstructed(:) - image_1v)/10304
-    reconstructed = mat2gray(reconstructed); 
-    imwrite(reconstructed,'face_input_1r_top15.pgm');
-    reconstructed = zeros(length(U),1);
-
-    % using all eigenface
+    %calculating MSE after each iteration and reconstructing image using 1, 15 and 200 eigenvectors
+    reconstructed = zeros(length(U),1);reconstructed_t = zeros(length(U),1);   
     for i = 1:200
         reconstructed = reconstructed + w(i)*U(:,i);
+        reconstructed = reconstructed + mean;
+        mse_t = (reconstructed(:) - image_1v)'*(reconstructed(:) - image_1v)/(row*col);
+        mse = [mse mse_t];       
+        if (i == 1 || i == 15 || i == 200)
+            reconstructed_t = reconstructed;
+            reconstructed_t = reshape(reconstructed_t,row,col);
+            reconstructed_t = mat2gray(reconstructed_t);
+            str = strcat('face_input_1r_',num2str(i),'.pgm');
+            imwrite(reconstructed_t,str);
+            figure()
+            imshow(reconstructed_t);
+            title(['Test Image 1 with ' num2str(i) ' eig vec, MSE: ' num2str(mse_t) ])
+            reconstructed_t = zeros(length(U),1); 
+        end
+       reconstructed = reconstructed - mean; 
     end
-    reconstructed = reconstructed + mean;
-    reconstructed = reshape(reconstructed,row,col);
-    mse = (reconstructed(:) - image_1v)'*(reconstructed(:) - image_1v)/10304
-    reconstructed = mat2gray(reconstructed);
-    imwrite(reconstructed,'face_input_1r_all.pgm');
-    reconstructed = zeros(length(U),1);
+    
+    xaxis = 1:parameter; yaxis = mse;
+    figure()
+    plot(xaxis',yaxis'); xlabel('#dimensions');ylabel('Mean Squared error, test image 1');
+    hold on;
+    
+     
 
 %for 'face_input_2.pgm'    
     new = imread('./face_input_2.pgm');
@@ -124,40 +121,32 @@ hold on;
     image_2v = new;
     new = new - mean;
     w = [];
+    mse = [];
     
     w = new' * U;
     
-    reconstructed = zeros(length(U),1);
-    % using only 1 eigenface(largest)
-    for i = 1:1
-        reconstructed = reconstructed + w(i)*U(:,i);
-    end
-    reconstructed = reconstructed + mean;
-    reconstructed = reshape(reconstructed,row,col);
-    mse = (reconstructed(:) - image_2v)'*(reconstructed(:) - image_2v)/10304
-    reconstructed = mat2gray(reconstructed);
-    imwrite(reconstructed,'face_input_2r_top1.pgm');
-    reconstructed = zeros(length(U),1);
-
-    % using 15 eigenface(largest)
-    for i = 1:15
-        reconstructed = reconstructed + w(i)*U(:,i);
-    end
-    reconstructed = reconstructed + mean;
-    reconstructed = reshape(reconstructed,row,col);
-    mse = (reconstructed(:) - image_2v)'*(reconstructed(:) - image_2v)/10304
-    reconstructed = mat2gray(reconstructed);
-    imwrite(reconstructed,'face_input_2r_top15.pgm');
-    reconstructed = zeros(length(U),1);
-
-    % using all eigenface
+    %calculating MSE after each iteration and reconstructing image using 1, 15 and 200 eigenvectors
+    reconstructed = zeros(length(U),1);reconstructed_t = zeros(length(U),1);   
     for i = 1:200
         reconstructed = reconstructed + w(i)*U(:,i);
+        reconstructed = reconstructed + mean;
+        mse_t = (reconstructed(:) - image_2v)'*(reconstructed(:) - image_2v)/(row*col);
+        mse = [mse mse_t];       
+        if (i == 1 || i == 15 || i == 200)
+            reconstructed_t = reconstructed;
+            reconstructed_t = reshape(reconstructed_t,row,col);
+            reconstructed_t = mat2gray(reconstructed_t);
+            str = strcat('face_input_2r_',num2str(i),'.pgm');
+            imwrite(reconstructed_t,str);
+            figure()
+            imshow(reconstructed_t);
+            title(['Test Image 2 with ' num2str(i) ' eig vec, MSE: ' num2str(mse_t) ])
+            reconstructed_t = zeros(length(U),1); 
+        end
+       reconstructed = reconstructed - mean; 
     end
-    reconstructed = reconstructed + mean;
-    reconstructed = reshape(reconstructed,row,col);
-    mse = (reconstructed(:) - image_2v)'*(reconstructed(:) - image_2v)/10304
-    reconstructed = mat2gray(reconstructed);
-    imwrite(reconstructed,'face_input_2r_all.pgm');
-    reconstructed = zeros(length(U),1);
-
+    
+    xaxis = 1:parameter; yaxis = mse;
+    figure()
+    plot(xaxis',yaxis'); xlabel('#dimensions');ylabel('Mean Squared error, test image 2');
+    hold on;

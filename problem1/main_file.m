@@ -72,6 +72,7 @@ CLASS3_s = bsxfun(@minus,CLASS3,mean3);
 sigma3 = (CLASS3_s * CLASS3_s')/images_num + lambda1 * eye(image_size);
 sigma3_inv = inv(sigma3); sigma3_det = det(sigma3);
 
+% result_1 contains the list of predicted class(1, 2 or 3)of all images
 result_1 = bayes_classifier(TEST,mean1,mean2,mean3,sigma1_inv,sigma2_inv,sigma3_inv,sigma1_det,sigma2_det,sigma3_det);
 [class1_c_a class1_m_a class2_c_a class2_m_a class3_c_a class3_m_a ] = check_result(result_1);
 
@@ -83,17 +84,17 @@ display(size(class2_c_a,2))
 display('  Accuracy for class3 is ')
 display(size(class3_c_a,2))
 display('Average accuracy is ')
-display((size(class1_c_a,2) + size(class1_c_a,2) +size(class1_c_a,2))/300 * 100)
+display((size(class1_c_a,2) + size(class2_c_a,2) +size(class3_c_a,2))/300 * 100)
 
 show_misclassified(result_1,1);
 
 % For part<b> : samples pooled together
 
-lambda2 = 0.6;
+lambda2 = 0.7;
 CLASS_comm = [CLASS1 CLASS2 CLASS3];
 mean_comm = sum(CLASS_comm,2)/(3*images_num);
 mean_comm_s = bsxfun(@minus,CLASS_comm,mean_comm);
-sigma_comm = (mean_comm_s) * (mean_comm_s')/(3*images_num) + lambda2 * eye(image_size);
+sigma_comm = ((mean_comm_s) * (mean_comm_s')/(3*images_num)).*eye(image_size) + lambda2 * eye(image_size);
 sigma_comm_inv = inv(sigma_comm); sigma_comm_det = det(sigma_comm);
 
 result_2 = bayes_classifier(TEST,mean1,mean2,mean3,sigma_comm_inv,sigma_comm_inv,sigma_comm_inv,sigma_comm_det,sigma_comm_det,sigma_comm_det);
@@ -107,7 +108,7 @@ display(size(class2_c_b,2))
 display('  Accuracy for class3 is ')
 display(size(class3_c_b,2))
 display('Average accuracy is ')
-display((size(class1_c_b,2) + size(class1_c_b,2) +size(class1_c_b,2))/300 * 100)
+display((size(class1_c_b,2) + size(class2_c_b,2) +size(class3_c_b,2))/300 * 100)
 
 show_misclassified(result_2,2);
 
@@ -128,7 +129,7 @@ display(size(class2_c_c,2))
 display('  Accuracy for class3 is ')
 display(size(class3_c_c,2))
 display('Average accuracy is ')
-display((size(class1_c_c,2) + size(class1_c_c,2) +size(class1_c_c,2))/300 * 100)
+display((size(class1_c_c,2) + size(class2_c_c,2) +size(class3_c_c,2))/300 * 100)
 
 show_misclassified(result_3,3);
 

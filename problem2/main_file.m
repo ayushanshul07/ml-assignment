@@ -4,7 +4,8 @@
 
 % Reading the image
 clear;clc;
-num_iter = 50;
+num_iter = 100;
+disp('Total number of iterations equals 100')
 image_file = 'ski_image.jpg';
 data = imread(image_file);
 [image_r image_c image_h] = size(data);
@@ -58,15 +59,15 @@ for iter = 1:num_iter
     %calculating 3 new covariances
     mean_shifted = repmat(mean1_new, 1, col);
     sigma1_new = (repmat(resp(1, :), 3, 1) .* (features - mean_shifted) ) * (features - mean_shifted)' ;
-    sigma1_new = sigma1_new/N1;
+    sigma1_new = sigma1_new/N1 + eye(3) / 2550;
     
     mean_shifted = repmat(mean2_new, 1, col);
     sigma2_new = (repmat(resp(2, :), 3, 1) .* (features - mean_shifted) ) * (features - mean_shifted)' ;
-    sigma2_new = sigma2_new/N2;
+    sigma2_new = sigma2_new/N2 + eye(3) / 2550;
     
     mean_shifted = repmat(mean3_new, 1, col);
     sigma3_new = (repmat(resp(3, :), 3, 1) .* (features - mean_shifted) ) * (features - mean_shifted)' ;
-    sigma3_new = sigma3_new/N3;
+    sigma3_new = sigma3_new/N3 + eye(3) / 2550;
 
 
     %calculating 3 new mixing coefficients
@@ -85,11 +86,14 @@ R_n = zeros(1,col); G_n = zeros(1,col); B_n = zeros(1,col);
 for var = 1:col
     [maximum index] = max(resp(:,var));
     if index == 1
-        R_n(var) = 255; G_n(var) = 0; B_n(var) = 0;
+       %R_n(var) = 255; G_n(var) = 0; B_n(var) = 0;
+       R_n(var) = mean1(1); G_n(var) = mean1(2);B_n(var) = mean1(3);
     elseif index == 2
-        R_n(var) = 0; G_n(var) = 255; B_n(var) = 0;
+       %R_n(var) = 0; G_n(var) = 255; B_n(var) = 0;
+       R_n(var) = mean2(1); G_n(var) = mean2(2);B_n(var) = mean2(3);
     else
-        R_n(var) = 0; G_n(var) = 0; B_n(var) = 255;
+       %R_n(var) = 0; G_n(var) = 0; B_n(var) = 255;
+       R_n(var) = mean3(1); G_n(var) = mean3(2);B_n(var) = mean3(3);
     end
 end
 
@@ -98,6 +102,10 @@ new_image(:, :, 1) = reshape(R_n,image_r,image_c);new_image(:, :, 2) = reshape(G
 strn1 = strcat(int2str(num_iter),image_file,'_segmented.jpg');
 strn2 = strcat(int2str(num_iter),image_file,'_loglikelihood.jpg');
 imwrite(new_image,strn1);
+figure()
+imshow(new_image);hold on;
+figure()
 fig = plot(loglikelihood_val);
+xlabel('#iterations');ylabel('LogLikelihood values');
 saveas(fig,strn2);
 disp('All iterations completed. Segmented image and the graph of loglikelihood vs iterations are saved in current folder :)')
